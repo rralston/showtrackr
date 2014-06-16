@@ -14,17 +14,10 @@ var async = require('async');
 var request = require('request');
 var xml2js = require('xml2js');
 
-var _ = require('lodash');
-
 var agenda = require('agenda')({ db: { address: 'localhost:27017/test' } });
 var sugar = require('sugar');
 var nodemailer = require('nodemailer');
-
-var csso = require('gulp-csso');
-var uglify = require('gulp-uglify');
-var concat = require('gulp-concat');
-var templateCache = require('gulp-angular-templatecache');
-var compress = require('compression')
+var _ = require('lodash');
 
 var showSchema = new mongoose.Schema({
   _id: Number,
@@ -79,23 +72,6 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
 var User = mongoose.model('User', userSchema);
 var Show = mongoose.model('Show', showSchema);
 
-app.set('port', process.env.PORT || 3000);
-app.use(compress())
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-app.use(cookieParser());
-app.use(session({ secret: 'keyboard cat' }));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(function(req, res, next) {
-  if (req.user) {
-    res.cookie('user', JSON.stringify(req.user));
-  }
-  next();
-});
-
 passport.serializeUser(function(user, done) {
   done(null, user.id);
 });
@@ -135,7 +111,7 @@ app.use(cookieParser());
 app.use(session({ secret: 'keyboard cat' }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: 86400000 }));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(function(req, res, next) {
   if (req.user) {
     res.cookie('user', JSON.stringify(req.user));
@@ -173,7 +149,6 @@ app.get('/api/shows', function(req, res, next) {
   } else {
     query.limit(12);
   }
-
   query.exec(function(err, shows) {
     if (err) return next(err);
     res.send(shows);
@@ -285,11 +260,24 @@ app.post('/api/shows', function(req, res, next) {
         }
         return next(err);
       }
-	var alertDate = Date.create('Next ' + show.airsDayOfWeek + ' at ' + show.airsTime).rewind({ hour: 2});
-	agenda.schedule(alertDate, 'send email alert', show.name).repeatEvery('1 week');
+      var alertDate = Date.create('Next ' + show.airsDayOfWeek + ' at ' + show.airsTime).rewind({ hour: 2});
+      agenda.schedule(alertDate, 'send email alert', show.name).repeatEvery('1 week');
       res.send(200);
     });
   });
+});
+
+app.get('*', function(req, res) {
+  res.redirect('/#' + req.originalUrl);
+});
+
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.send(500, { message: err.message });
+});
+
+app.listen(app.get('port'), function() {
+  console.log('Express server listening on port ' + app.get('port'));
 });
 
 agenda.define('send email alert', function(job, done) {
@@ -331,17 +319,4 @@ agenda.on('start', function(job) {
 
 agenda.on('complete', function(job) {
   console.log("Job %s finished", job.attrs.name);
-});
-
-app.get('*', function(req, res) {
-  res.redirect('/#' + req.originalUrl);
-});
-
-app.use(function(err, req, res, next) {
-  console.error(err.stack);
-  res.send(500, { message: err.message });
-});
-
-app.listen(app.get('port'), function() {
-  console.log('Express server listening on port ' + app.get('port'));
 });
