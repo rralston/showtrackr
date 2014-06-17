@@ -14,7 +14,7 @@ var async = require('async');
 var request = require('request');
 var xml2js = require('xml2js');
 
-var agenda = require('agenda')({ db: { address: 'mongodb://rupert:demodb1@ds041198.mongolab.com:41198/showtrackr' } });
+var agenda = require('agenda')({ db: { address: 'mongodb://admin:admin@ds041198.mongolab.com:41198/showtrackr' } });
 var sugar = require('sugar');
 var nodemailer = require('nodemailer');
 var _ = require('lodash');
@@ -99,7 +99,7 @@ function ensureAuthenticated(req, res, next) {
   else res.send(401);
 }
 
-mongoose.connect('mongodb://rupert:demodb1@ds041198.mongolab.com:41198/showtrackr');
+mongoose.connect('mongodb://admin:admin@ds041198.mongolab.com:41198/showtrackr');
 
 var app = express();
 
