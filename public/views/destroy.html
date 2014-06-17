@@ -1,0 +1,17 @@
+<div class="container">
+  <div class="panel panel-default">
+    <div class="panel-heading">Remove TV Show</div>
+    <div class="panel-body">
+      <form class="form" method="post" ng-submit="destroyShow()" name="destroyForm">
+        <div class="form-group" ng-class="{ 'has-success' : destroyForm.showName.$valid && destroyForm.showName.$dirty, 'has-error' : destroyForm.showName.$invalid && destroyForm.showName.$dirty }">
+          <input class="form-control" type="text" name="showName" ng-model="showName" placeholder="Enter TV show name" required autofocus>
+          <div class="help-block text-danger" ng-if="destroyForm.showName.$dirty" ng-messages="destroyForm.showName.$error">
+            <div ng-message="required">TV show name is required.</div>
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit" ng-disabled="destroyForm.$invalid">Destroy</button>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="controllers/destroy.js"></script>

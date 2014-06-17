@@ -23,6 +23,10 @@ angular.module('MyApp', ['ngCookies', 'ngResource', 'ngMessages', 'ngRoute', 'mg
         templateUrl: 'views/add.html',
         controller: 'AddCtrl'
       })
+      .when('/destroy', {
+        templateUrl: 'views/destroy.html',
+        controller: 'DestroyCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
